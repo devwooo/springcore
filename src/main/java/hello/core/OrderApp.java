@@ -1,5 +1,6 @@
 package hello.core;
 
+import hello.core.config.AppConfig;
 import hello.core.domain.Member;
 import hello.core.domain.Order;
 import hello.core.repository.DiscountPolicy;
@@ -14,18 +15,20 @@ import hello.core.service.OrderServiceImpl;
 public class OrderApp {
 
     public static void main(String[] args) {
-        MemberService ms = new MemberServiceImpl();
-        OrderService os = new OrderServiceImpl();
+
+        AppConfig appConfig = new AppConfig();
+        MemberService ms = appConfig.memberService();
+        OrderService os = appConfig.orderService();
+        //MemberService ms = new MemberServiceImpl(null);
+        //OrderService os = new OrderServiceImpl(null, null);
         DiscountPolicy dp = new FixDiscountPolicy();
 
         Long memberId = 1L;
         Member member = new Member(memberId, "springA", Grade.VIP);
         ms.join(member);
 
-        Order order = os.createOrder(memberId, "ItemA", 1000);
-
+        Order order = os.createOrder(memberId, "ItemA", 10000);
         System.out.println(order.toString());
-
-
+        System.out.println("order = " + order.calculatorPrice());
     }
 }
