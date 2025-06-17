@@ -5,6 +5,7 @@ import hello.core.domain.Order;
 import hello.core.repository.DiscountPolicy;
 import hello.core.repository.FixDiscountPolicy;
 import hello.core.repository.MemoryMemberRepository;
+import hello.core.repository.RateDiscountPolicy;
 import hello.core.service.MemberService;
 import hello.core.service.MemberServiceImpl;
 import hello.core.service.OrderService;
@@ -33,6 +34,7 @@ public class AppConfig {
 
     public DiscountPolicy discountPolicy() {
         return new FixDiscountPolicy();
+        //return new RateDiscountPolicy();
     }
 
     // new MemoryMemberRepository() 중복을 memberRepository()로 변경
