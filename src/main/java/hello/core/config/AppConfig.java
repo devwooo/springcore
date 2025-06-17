@@ -14,24 +14,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
+@Configuration
 public class AppConfig {
     
     // AppConfig 리팩토링
-    // 
+    //
+    @Bean
     public MemberService memberService() {
         // 생성자 주입
         return new MemberServiceImpl(memberRepository());
     }
 
+    @Bean
     public OrderService orderService() {
         // 생성자 주입
         return new OrderServiceImpl(memberRepository(), discountPolicy());
     }
 
-    private MemoryMemberRepository memberRepository() {
+    @Bean
+    public MemoryMemberRepository memberRepository() {
         return new MemoryMemberRepository();
     }
 
+    @Bean
     public DiscountPolicy discountPolicy() {
         return new FixDiscountPolicy();
         //return new RateDiscountPolicy();
