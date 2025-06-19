@@ -180,3 +180,30 @@ Ioc, DI, 컨테이너
   - 기존에는 직접 자바코드로 모든것을 했다면 이제 스프링 컨테이너에 객체를 스프링 빈으로 등록하고, 스프링 컨테이너에서 스프링 빈을 찾아서 사용하도록 변경되었다.
 
 
+==========================
+## 스프링 컨테이너와 스프링 빈
+- 스프링 컨테이너 생성과정
+```
+    ApplicationContext applicationContext = new AnnotationconfigApplicationContext(Appconfig.class);
+```
+- ApplicationContext를 스프링 컨테이너 라고 하며, ApplicationContext는 인터페이스 이다. XML기반으로 생성할 수 있고, 애노테이션 기반 자바 설정 클래스로 만들수 있다.
+- new AnnotationconfigApplicationContext(AppConfig.class); 이클래스는 ApllicationContext의 구현체 이다.
+- 더 정확히는 스프링 컨테이너를 말할때 BeanFactory, ApplicationContext를 구분해서 말한다.
+
+  - Appconfig.class를 읽어 
+  - @Bean(name="지정할 Bean이름") 이 붙어있는 함수를 스프링컨테이너에 객체로 저장한다.
+  - 의존관계 설정 
+
+## 컨테이너에 등록한 BEAN 확인
+- 모든 빈 출력
+  - String[] beanDefinitionNames = ac.getBeanDefinitionNames();
+- 직접등록한 빈만 출력
+  - BeanDefinition beanDefinition = ac.getBeanDefinition(bdn); 
+  - beanDefinition.getRole() == BeanDefinition.ROLE_APPLICATION
+- 빈 이름으로 조회
+  - MemberService memberService = ac.getBean("memberService", MemberService.class);
+- 빈 타입으로 조회
+  - MemberService memberService = ac.getBean(MemberService.class);
+
+- 동일한 타입이 둘 이상인경우 > 오류가 발생한다 이때는 빈 이름을 지정하자
+  - ac.getBeansOfType()으로 해당 타입의 모든 빈을 확인 할 수 있다.
