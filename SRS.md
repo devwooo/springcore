@@ -207,3 +207,37 @@ Ioc, DI, 컨테이너
 
 - 동일한 타입이 둘 이상인경우 > 오류가 발생한다 이때는 빈 이름을 지정하자
   - ac.getBeansOfType()으로 해당 타입의 모든 빈을 확인 할 수 있다.
+
+
+## 스프링 빈 조회 - 상속관계
+  - 부모 타입으로 조회하면, 자식 타입도 함께 조회한다.
+  - 따라서 object 타입을 조회하면 모든 스프링 빈을 조회한다.
+
+
+## BeanFactory 와 ApplicationContext
+- BeanFactory(interface)
+  - 스프링 컨테이너의 최상위 인터페이스
+  - 스프링 빈을 관리하고 조회하는 역할을 담당
+- ApplicationContext
+  - BeanFactory 기능을 모두 상속받아서 제공한다
+  - BeanFactory가 빈을 검색하고 관리하는 기능을 제공한다면 그렇다면 ApplicationContext와 는 무슨 차이가 있는걸까
+  - 부가 기능을 제공해준다
+    - MessageSource, EnviromentCapable, ApplicationEvnetPublisher, ResourceLoader 등등 다양한 인터페이스를 받고 있다.
+      - MessageSource : 한국어로 들어오면 한국어로, 영어권으로 들어오면 영어로 출력
+      - EnviromentCapable : 환경변수 > 로컬, 개발, 운영등을 분리해서 처리 가능
+      - ApplicationEvnetPublisher : 이벤트를 발행하고 구독하는 모델을 편리하게 지원
+      - ResourceLoader : 파일, 클래스 패스, 외부 등에서 리소스를 편리하게 조회
+
+## 자바코드, XML 설정방식
+- ApplicationContext <-  AnnotationConfigApplicationContext(AppConfig.class), GenericXmlApplicationContext(appConfig.xml), XxxApplicationContext(appConfig.xxx)
+
+## BeanDefinition
+  - BeanDefinition 이라는 추상화가 있다.
+  - BeanDefinition을 빈 설정 메타 정보라 한다
+    - @Bean, <bean> 당 각각 하나씩 메타 정보가 생성된다.
+  - 스프링 컨테이너는 이 메타정보를 기반으로 빈을 생성한다.
+
+  - AnnotationConfigApplicationContext가 AnnotatedBeanDefinitionRead 사용해서 > AppConfig.class를 읽어 > BeanDefinition 생성한다.
+  - BeanDefinition을 직접 생성해서 스프링 컨테이너에 직접 등록할 수도 있다. 하지만 실무에서 직접 정의하거나 사용할 일은 없다.
+
+
