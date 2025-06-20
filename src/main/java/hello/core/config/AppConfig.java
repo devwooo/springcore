@@ -16,23 +16,39 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-    
     // AppConfig 리팩토링
     //
+
+
+    // 예상결과
+    //call AppConfig.memberService
+    //call AppConfig.memberRepository
+    //call AppConfig.memberRepository
+    //call AppConfig.orderService
+    //call AppConfig.memberRepository
+
+    // 실제 결과
+    //call AppConfig.MemberService
+    //call AppConfig.memberRepository
+    //call AppConfig.orderService
+
     @Bean
     public MemberService memberService() {
         // 생성자 주입
+        System.out.println("call AppConfig.MemberService");
         return new MemberServiceImpl(memberRepository());
     }
 
     @Bean
     public OrderService orderService() {
         // 생성자 주입
+        System.out.println("call AppConfig.orderService");
         return new OrderServiceImpl(memberRepository(), discountPolicy());
     }
 
     @Bean
     public MemoryMemberRepository memberRepository() {
+        System.out.println("call AppConfig.memberRepository");
         return new MemoryMemberRepository();
     }
 
