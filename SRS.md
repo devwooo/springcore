@@ -325,3 +325,79 @@ public MemberRepository memberRepository() {
   - AppConfig@CGLIB는 AppConfig의 자식 타입이므로, AppConfig 타입으로 조회가 가능하다.  
 
 - @Configutation 없이 @Bean만 사용할 경우 Bean 등록이 되지만 싱글톤은 보장되지 않는다.
+
+
+## 컴포넌트 스캔과 의존관계 자동 주입 시작하기
+ - @Bean이나 XML 등을 통해서 설정 정보에 직접 등록할 스프링 빈을 나였했다.
+ - 이렇게 일일이 등록하게 되면 문제가 발생할 수 있다. 따라서 스프링은 설정 정보가 없어도 자동으로 
+ - 스프링 빈을 등록하는 컴포넌트 스캔이라는 기능을 제공한다.
+ - 의존 관계도 자동으로 주입하는 @Autowired 기능을 제공한다.
+ - 
+ - 컴포넌트 스캔을 사용하려면 @ComponentScan 을 붙여준다.
+ - 기존의 AppConfig와는 다르게 @Bean이 존재하지 않는다.
+    - 컴포넌트 스캔은 이름 그대로 @Component 애노테이션이 붙은 클래스를 스캔해서 스프링 빈으로 등록한다.
+ - @Component 스캔에 의해서 Bean으로 등록될때 의존관계 주입을 하기 위해서는 @Autowired를 붙여주면 자동으로 의존성을 주입해준다
+   - @Autowired가 붙어있는 메서드의 파라미터의 타입을 찾아 넣어준다.
+ - @Component 어노테이션은 구현체에 등록해줘야 한다.
+    - 빈 이름 기본 전략 : MemberServiceImpl > memberServiceImpl
+    - 빈 이름 직접 지정 : @Component("memberServiceImpl") 이런식으로
+
+## 탐색 위치와 기본 스캔 대상
+- 탐색할 위치를 지정 할 수 있다.
+  - basePackages = "helle.core"  >> hello.core 해당 패키지부터 하위패키지를 모두 찾아서 등록한다. 
+  - 여러개 등록시 basePackages = {"1", "2", "3","4"}
+  - 만약 지정하지 않으면 해당 @ComponentScan 을 붙인 클래스의 패키지를 기준으로 하위 패키지를 찾아서 등록한다.
+  - basePackageClasses = "" 지정시 해당 클래스의 패키지가 기준이 되어 하위 패키지를 찾아서 등록한다.
+
+  - 컴포넌트 스캔의 대상 
+    - @Component
+    - @Controller
+    - @Service
+    - @Repository : 스프링 데이터 접근 계층으로 인식하고, 데이터 계층의 예외를 스프링 예외로 변환해준다.
+    - @Configuration
+  
+## 필터
+  - userDefaultFilter 옵션은 기본으로 켜져있는데, 이옵션을 끄면 기본 스캔 대상들이 제외된다.
+  - includeFilters >> 해당 어노테이션이 붙으면 스프링 빈에 등록해라 >> 사용자 어노테이션을 추가하여 스프링 생성 하는거겠죠?
+    - includeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
+  - excludeFilter >> 해당 어노테이션이 붙으면 스프링 빈에 등록하지 않는다 >> 스프링 빈 생성 방지 
+    - excludeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyExcludeComponent.class)
+
+  - FilterType 옵션
+    - ANNOTATION : 기본값, 애노테이션을 인식해서 동작
+      - org.example.SomeAnnotation
+    - ASSIGNABLE_TYPE : 지정한 타입과 자식 타입을 인식해서 동작한다.
+      - org.example.SomeClass
+    - ASPECTJ : AspectJ 패턴 사용
+      - org.example..*Service+
+    - REGEX : 정규표현식
+      - org/.example/.Default.*
+    - CUSTOM : TypeFilter라는 인터페이스를 구현해서 처리
+
+## 중복 등록과 충돌
+  - 같은 빈 이름을 등록하면 어떻게 될까?
+    1. 자동 빈 등록 vs 자동 빈 등록
+       - 컴포넌트 스캔에 의해 자동으로 스프링빈이 등록되는데 이름이 같을 경우 오류를 발생시킨다. ConflictingBeanDefinitionException
+       2. 수동 빈 등록 vs 자동 빈등록
+          - 수동 빈 등록이 우선권을 가진다. 
+          - 수동 빈 등록시 남는 로그
+          ```
+            Overriding bean definition for bean 'memoryMemberRepository' with a diffrent 
+            definition: replacing
+           ```
+          
+    - 최근 스프링 부트에서는 수동 빈 등록과 자동 빈 등록이 충돌나면 오류가 발생하도록 기본 값을 바꾸었다.
+      - 수동 빈 등록, 자동 빈 등록 오류시 스프링 부트 에러
+      ```
+      Description:
+      The bean 'memoryMemberRepository', defined in class path resource [hello/core/config/AutoAppConfig.class], could not be registered. A bean with that name has already been defined in file [E:\20250101\springcore\out\production\classes\hello\core\repository\MemoryMemberRepository.class] and overriding is disabled.
+      Action:
+      Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+      
+      application.yml 또는 application.properties 에서
+      spring.main.allow-bean-definition-overriding=true 지정하면 오버라이딩 되도록 설정하게 된다.
+      ```
+      
+
+## 의존관계 자동 주입
+

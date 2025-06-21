@@ -3,7 +3,10 @@ package hello.core.service;
 import hello.core.domain.Member;
 import hello.core.domain.Order;
 import hello.core.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OrderServiceImpl implements OrderService {
 
     //private final MemberRepository memberRepository = new MemoryMemberRepository();
@@ -23,7 +26,9 @@ public class OrderServiceImpl implements OrderService {
 
 
     //관심사의 분리
+    @Autowired
     private final MemberRepository memberRepository;
+    @Autowired
     private final DiscountPolicy discountPolicy;
 
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
