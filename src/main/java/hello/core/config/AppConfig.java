@@ -10,6 +10,7 @@ import hello.core.service.MemberService;
 import hello.core.service.MemberServiceImpl;
 import hello.core.service.OrderService;
 import hello.core.service.OrderServiceImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

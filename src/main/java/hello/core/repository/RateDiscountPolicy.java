@@ -1,5 +1,6 @@
 package hello.core.repository;
 
+import hello.core.annotation.MainDiscountPolicy;
 import hello.core.domain.Member;
 import hello.core.role.Grade;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,7 +8,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
-@Primary
+//@Primary
+@MainDiscountPolicy
 public class RateDiscountPolicy implements DiscountPolicy {
 
     private int discountPercent = 10;

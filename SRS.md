@@ -542,47 +542,153 @@ noBean3 = Optional.empty >> Optional의 empty 처리
 
 ## 문제 >> 해결방법
 - @Autowired 필드명 매칭
-  - @Autowired는 타입 매칭을 시도하고, 이때 여러 빈이 있다면, 필드이름, 파라미터 이름으로 빈 이름을 추가 매칭한다.
+- @Autowired는 타입 매칭을 시도하고, 이때 여러 빈이 있다면, 필드이름, 파라미터 이름으로 빈 이름을 추가 매칭한다.
+  ```
+      기존코드
+      @Autowired
+      private DiscountPolicy discountPolicy
+    
+      필드 명을 빈 이름으로 변경
+      @Autowired
+      private DiscountPolicy rateDiscountPolicy
+    
+    
+  ```
+  - @Quilifier > @Quilifier 끼리 매칭 > 빈 이름 매칭
+    - 추가 구분자를 붙여주는 방법, 주입시 추가적인 방법을 제공하는거지 빈 이름을 변경하는건 아니다
     ```
-        기존코드
-        @Autowired
-        private DiscountPolicy discountPolicy
-    
-        필드 명을 빈 이름으로 변경
-        @Autowired
-        private DiscountPolicy rateDiscountPolicy
-    
-    
-    ```
-- @Quilifier > @Quilifier 끼리 매칭 > 빈 이름 매칭
-  - 추가 구분자를 붙여주는 방법, 주입시 추가적인 방법을 제공하는거지 빈 이름을 변경하는건 아니다
-  ```
-  생성자 자동 주입 예시
-  @Autowired
-  public OderServiceImpl(MemberRepository memberRepositorym
-                    @Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy){
-    this.memberRepository = memberRepository;
-    this.discountPolicy = discountPolicy; 
-  }
-  수정자 자동 주입 예시
-  @Autowired
-  public DiscountPolicy setDiscountPolicy(@Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy){
-    return discountPolicy;
-  }
-  ```
-  - @Qualifier 로 주입할때 @Qualifier("mainDiscountPolicy") 를 못찾으면
-  - mainDiscountPolicy이름의 스프링 빈을 추가로 찾는다. @Qualifier는 @Qualifier 찾는
-  - 용도로만 사용하는게 명확하다.
-  - 직접 @Bean 등록시에도 동일 하게 사용가능하다
-  ```
-    @Bean
-    @Qualifier("mainDiscountPolicy")
-    public DiscountPolicy discountPolicy() {
-     retur new ~
+    생성자 자동 주입 예시
+    @Autowired
+    public OderServiceImpl(MemberRepository memberRepositorym
+                      @Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy){
+      this.memberRepository = memberRepository;
+      this.discountPolicy = discountPolicy; 
     }
-  ```
+    수정자 자동 주입 예시
+    @Autowired
+    public DiscountPolicy setDiscountPolicy(@Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy){
+      return discountPolicy;
+    }
+    ```
+    - @Qualifier 로 주입할때 @Qualifier("mainDiscountPolicy") 를 못찾으면
+    - mainDiscountPolicy이름의 스프링 빈을 추가로 찾는다. @Qualifier는 @Qualifier 찾는
+    - 용도로만 사용하는게 명확하다.
+    - 직접 @Bean 등록시에도 동일 하게 사용가능하다
+    ```
+      @Bean
+      @Qualifier("mainDiscountPolicy")
+      public DiscountPolicy discountPolicy() {
+       retur new ~
+      }
+    ```
+    - @Qualifier 는 스프링 빈 등록하기 위한 애노테이션은 아니고 스프링 빈으로 등록된것 들 중에 이것을 선택하겠다라고 지정하는 개념
+    ```
+    @Component
+    public class Dog implements Animal {
+      @Override
+      public void sound() {
+        System.out.println("멍멍");
+      }
+    }
+    
+    @Component
+    public class Cat implements Animal {
+      @Override
+      public void sound() {
+        System.out.println("야옹");
+      }
+    }
+    
+    @Component
+    public class AnimalService {
+      private final Animal animal;
+      // 여러개의 Animal 들중에 dog를 넣어주라고 지정 
+      public AnimalService(@Qualifier("dog") Animal animal) {
+          this.animal = animal;
+      }
+    }
+    
+    
+    ```
 - @Primary 사용
   - 우선순위를 정하는 방법이다.
   - @Autowired 시에 여러 빈 매칭되면 @Primary가 붙어있는 빈이 우선순위가 된다.
 
 - 우선순위는 Qualifier >>>> Primary 로  Qualifier 가 더 높다
+
+
+## 애노테이션 직접 만들기
+ - @Qualifier("문자") 의경우 컴파일 타입 체크가 안된다. >> 애노테이션을 직접 만들어 사용하므로써 해결할 수 있다.
+
+## 조회한 빈이 모두 필요할떄 List, Map
+- Map, List 로 모든 DiscountPolicy를 주입받는다. 이때 fixDiscountPolicy, rateDiscountPolicy가 주입된다.
+- discount() 메서드는 discountCode로  Map에서 주입됬던 bean을 찾아 실행한다.
+```
+@Autowired
+public DiscountService(Map<String, DiscountPolicy> policyMap, List<DiscountPolicy> policies) {
+  this.policyMap = policyMap;
+  this.policies = policies;
+  System.out.println("policyMap = " + policyMap);
+  System.out.println("policies = " + policies);
+}
+policyMap = {fixDiscountPolicy=hello.core.repository.FixDiscountPolicy@29df4d43, rateDiscountPolicy=hello.core.repository.RateDiscountPolicy@5dd91bca}
+policies = [hello.core.repository.FixDiscountPolicy@29df4d43, hello.core.repository.RateDiscountPolicy@5dd91bca]
+
+```
+
+## 자동, 수동 올바른 실무 운영 기준
+- 자동 기능을 기본으로 사용
+- 수동 빈 등록은 언제 사용하나?
+  - 업무 로직 빈 : 자동 빈 등록
+    - 비즈니스 로직 중 다형성을 적극 활용 할 때 
+    - ```
+          이렇게 다형성을 사용해서
+          Map<String, DiscountPolicy> map ... 이런식으로 DI 받아서 사용하는 경우 한눈에 보기쉽게 해당 클래스에 대해서 수동 등록하는것도 좋다.
+          @Configuration
+          public class DiscountPolicyConfig {
+            @Bean
+            public DiscountPolicy rateDiscountPolicy() {...}
+            @Bean
+            public DiscountPolicy fixDiscountPolicy() {...}
+          }   
+      ```
+  - 기술 지원 빈 : 수동 빈 등록
+    - 기술적인 문제나, 공통 관심사를 처리할 때 주로 사용된다.
+    - 데이터베이스 연결이나, 공통 로그처리 처럼 업무 로직을 지원하기 위한 하부 기술이나 공통 기술들이다.
+      - 스프링 부트의 경우 DataSouce 같은 데이터베이스 연결에 사용하는 기술 지원 로직까지 내부에서 자동 등록하는데,
+      - 이런 부분은 메뉴얼을 잘 참고해서 스프링 부트가 의도한 대로 편리하게 사용하면 된다.
+      - 반면에 스프링 부트가 아니라 내가 직접 기술 지원 객체를 스프링 빈으로 등록 한다면 수동으로 등록해서 명확하게 들어내는 것이 좋다.
+
+
+## 빈 생명주기 콜백
+- 데이터베이스 커넥션 풀이나, 네트워크 소켓 처럼 애플리케이션 시작 시점에 필요한 연결을 미리 해두고 애플리케이션 종료 시점에
+- 연결을 모두 종료하는 작업을 진행하려면, 객체의 초기화와 종료 작업이 필요하다.
+
+  - 간단하게 외부 네트워크에 미리 연결하는 개체를 하나 생성한다고 가정해보고,
+  - 애플리케이션 시작시점에 connect(), 호출해서 연결을 맺어두어야하고, 종료되면 disConnect() 호출해서 연결을 끊어야 한다.
+```
+객체를 생성하는 단계에는 url이 없고, 객체를 생성한 다음에 외부에서 수정자 주입을 통해서 setUrl()이 호출되어야 url이 존재하게 된다.
+생성자 호출, urlnull
+connect: null
+call : null, message :초기화 연결 메시지
+
+```
+  - 객체 생성 -> 의존관계 주입 setter, 필드 injdect (생성자 주입 예외임) 
+  - 스프링 빈은 객체를 생성하고, 의존관계 주입이 다 끝난 다음에야 필요한 데이터를 사용 할 수 있는 준비가 완료된다.
+  - 따라서 초기화 작업은 의존관계 주입이 모두 완료되고 난 다음에 호출해야 한다. 그렇다면 의존관계 주입이 완료된 시점은 어떻게 확인할 수 있나?
+    - 스프링은 의존관계 주입이 완료되면 스프링 빈에게 콜백 메서드를 통해서 초기화 시점을 알려주는 다양한 기능을 제공 한다.
+    - 또한 스프링은 스프링 컨테이너가 종료되기 직전에 소멸 콜백을 준다. 따라서 안전하게 종료 작업을 진행할 수 있다.
+    -  스프링 빈의 이벤트 라이프사이클(싱글톤에 대한 설명)
+      - 스프링 컨테이너 생성 > 스프링 빈 생성 > 의존관계 주입 > 초기화 콜백 > 사용 > 소멸전 콜백 > 스프링 종료
+        - 초기화 콜백 : 빈이 생성되고, 빈의 의존관계 주입이 완료된 후 호출
+        - 소멸전 콜백 : 빈이 소멸되기 직전에 호출
+  - 참고 : 객체의 생성과 초기화를 분리하자
+    - 생성자는 필수 정보를 받고, 메모리를 할당해서 객체를 생성하는 책임을 가진다.
+    - 반면 초기화는 생성된 값을 활용해서 외부 커넥션을 연결하는등 무거운 동작을 수행한다
+    - 따라서 생성자 안에서 무거운 초기화 작업을 함꼐 하는것 보다는 객체를 생성하는 부분과 초기화 하는 부분을 명확하게 나누는 것이 유지보수 관점에서 좋다.
+    - 물론 초기화 작업이 내부 값들만 약간 변경하는 정도로 단순한 경우에는 생성자에서 한번에 다 처리하는게 더나을수 있다.
+
+  - 크게 3가지 방법으로 빈 생명주기 콜백을 지원한다.
+    - 인터페이스(InitializingBean, DisposableBean)
+    - 설정 정보에 초기화 메서드, 종료 메서드 지정
+    - @PostConstrict, @PreDestory 애노테이션 지원

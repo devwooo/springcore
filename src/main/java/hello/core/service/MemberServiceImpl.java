@@ -13,9 +13,10 @@ public class MemberServiceImpl implements MemberService {
     //private final MemberRepository memberRepository = new MemoryMemberRepository();
 
     // 관심사의 구분
-    @Autowired  // 마치 ac.getBean(MemberRepository.class) 한것처럼
+      // 마치 ac.getBean(MemberRepository.class) 한것처럼
     private final MemberRepository memberRepository;
 
+    @Autowired
     public MemberServiceImpl(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
