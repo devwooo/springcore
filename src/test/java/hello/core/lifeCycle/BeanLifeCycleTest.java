@@ -25,7 +25,8 @@ class BeanLifeCycleTest {
         public NetworkClient networkClient() {
             NetworkClient networkClient = new NetworkClient();
             networkClient.setUrl("https://naver.com");
-            //주입하고 나서
+            // 생성자 호출 후 의존성 주입하고 나서
+            // afterPropertiesSet() 이 실행되네
             return networkClient;
         }
     }

@@ -692,3 +692,11 @@ call : null, message :초기화 연결 메시지
     - 인터페이스(InitializingBean, DisposableBean)
     - 설정 정보에 초기화 메서드, 종료 메서드 지정
     - @PostConstrict, @PreDestory 애노테이션 지원
+
+## InitializingBean > afterPropertiesSet() 메서드로 초기화를 지원한다.
+## DisposableBean > destory()메서드로 소멸을 지원한다.
+ - 초기화, 소멸 인터페이스의 단점 > 스프링 전용이다, 해당 코드가 스프링 전용 인터페이스에 의존한다
+ - 초기화, 소멸 메서드 이름 변경 불가능, 내가 코드를 고칠수 없는 외부 라이브러리에 적용할 수 없다. 
+ - 잘 사용하지 않는다.
+
+
