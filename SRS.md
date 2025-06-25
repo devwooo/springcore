@@ -794,3 +794,48 @@ PrototypeBean HelloBean() {
 3. JSR-330 Provider 
    - 마지막 방법은 javax.inject.Provider 라는 JSR-330자바 표준을 사용하는 방법으로
    - 이 방법을 사용하려면 'jakarta.inject:jakarta.inject-api:2.0.1' 라이브러리를 추가해줘야 한다.
+
+
+## 웹 스코프
+ - 웹 환경에서만 도앚ㄱ, 종료시점까지 관리한다 따라서 종료 메서드가 호출된다
+ - 종류
+   - request : HTTP 요청이 들어오고, 나갈 떄 까지 유지됨, 각각의 HTTP 요청마다 별도의 빈 인스턴스가 생성됨
+   - session 
+   - application
+   - websocket
+ - 로그를 출력하기 위한 MyLogger / @Scope(value = "request"), HTTP 요청당 하나씩 생성되고, HTTP 요처잉 끝나는 시점에 소멸된다.
+ - 빈이 생성되는 시점에 자동으로 @PostConstruct 초기화 메서드로 uuid를 지정했고,  해당 uuid는 HTTP 당 하나씩 생성되므로 다른 HTTP 요청과 구분된다.
+ - 소멸시점에 @PreDestory 호출된다.
+
+ - 에러발생 
+   - Scope 'request' is not active for the current thread
+   - 스프링 애플리케이션을 실행하는 시점에 싱글톤 빈은 생성해서 주입이 가능하지만, request Scope Bean은 실제 고객이 요청이 와야 생성할 수 있다
+   - 따라서 에러가 발생한것이다
+   - 실제 Bean을 받는 단계를 뒤로 미뤄야 한다.(스프링 컨테이너가 동작할때 주입받는게 아니라 요청이 오면 받도록)
+    
+ - 해결방법
+   - ObjectProvider 사용한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
