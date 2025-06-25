@@ -815,7 +815,10 @@ PrototypeBean HelloBean() {
     
  - 해결방법
    - ObjectProvider 사용한다.
-
+   - MyLogger의 Proxy 객체가 LogDemoController, LogDemoService에 주입되고
+   - 실제 요청이 들어올때 MyLogger Proxy객체를 토대로 실체 인스턴스를 생성하여 주입된다.
+   - 한개의 HTTP 요청으로 생성된 MyLogger는  해당 요청에서는 항상 같은 MyLogger 객체를 반환한다.
+   - 따라서 각각의 HTTP 요청마다 각개의 MyLogger가 생성되고 해당 HTTP는 controller, service 등등에서 공유 된다.
 
 
 
